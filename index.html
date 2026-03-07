@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <div id="line-gutter"></div>
     <div id="highlight-overlay"></div>
     <textarea
       placeholder="Start typing markdown..."
@@ -33,6 +34,7 @@
       const textarea = document.querySelector("textarea");
       const overlay = document.getElementById("ascii-overlay");
       const highlightOverlay = document.getElementById("highlight-overlay");
+      const lineGutter = document.getElementById("line-gutter");
 
       function escapeHtml(text) {
         return text
@@ -119,17 +121,57 @@
         highlightOverlay.innerHTML = highlightMarkdown(textarea.value) + "\n";
       }
 
+      function getCurrentLine() {
+        return textarea.value.substring(0, textarea.selectionStart).split('\n').length;
+      }
+
+      let _prevLineCount = 0;
+      let _prevCurrentLine = 0;
+
+      function updateLineNumbers() {
+        const lineCount = textarea.value.split('\n').length;
+        const currentLine = getCurrentLine();
+
+        const digits = Math.max(2, String(lineCount).length);
+        document.documentElement.style.setProperty('--gutter-width', (digits * 9 + 20) + 'px');
+
+        if (lineCount !== _prevLineCount) {
+          let html = '';
+          for (let i = 1; i <= lineCount; i++) {
+            const cls = i === currentLine ? 'line-number active' : 'line-number';
+            html += `<span class="${cls}">${i}</span>`;
+          }
+          lineGutter.innerHTML = html;
+          _prevLineCount = lineCount;
+        } else if (currentLine !== _prevCurrentLine) {
+          if (_prevCurrentLine > 0 && lineGutter.children[_prevCurrentLine - 1])
+            lineGutter.children[_prevCurrentLine - 1].classList.remove('active');
+          if (lineGutter.children[currentLine - 1])
+            lineGutter.children[currentLine - 1].classList.add('active');
+        }
+        _prevCurrentLine = currentLine;
+      }
+
       textarea.addEventListener("input", () => {
         overlay.classList.toggle("hidden", textarea.value.length > 0);
         updateHighlight();
+        updateLineNumbers();
       });
 
       textarea.addEventListener("scroll", () => {
         highlightOverlay.scrollTop = textarea.scrollTop;
         highlightOverlay.scrollLeft = textarea.scrollLeft;
+        lineGutter.scrollTop = textarea.scrollTop;
       });
 
       updateHighlight();
+      updateLineNumbers();
+
+      document.addEventListener("selectionchange", () => {
+        if (document.activeElement === textarea) {
+          updateLineNumbers();
+        }
+      });
 
       textarea.addEventListener("keydown", (e) => {
         if (e.key === "Tab") {
