@@ -73,13 +73,34 @@
                ██╔═══╝ ██╔══██║██║  ██║
                ██║     ██║  ██║██████╔╝
                ╚═╝     ╚═╝  ╚═╝╚═════╝
-</pre>
+</pre
+    >
 
     <script>
       const textarea = document.querySelector("textarea");
       const overlay = document.getElementById("ascii-overlay");
       textarea.addEventListener("input", () => {
         overlay.classList.toggle("hidden", textarea.value.length > 0);
+      });
+
+      textarea.addEventListener("keydown", (e) => {
+        if (e.key === "Tab") {
+          e.preventDefault();
+          if (e.shiftKey) {
+            const start = textarea.selectionStart;
+            const beforeCursor = textarea.value.substring(0, start);
+            const lineStart = beforeCursor.lastIndexOf("\n") + 1;
+            const linePrefix = textarea.value.substring(lineStart, start);
+            if (linePrefix.match(/^ {1,2}/)) {
+              const spaces = linePrefix.match(/^ {1,2}/)[0].length;
+              textarea.selectionStart = lineStart;
+              textarea.selectionEnd = lineStart + spaces;
+              document.execCommand("delete", false);
+            }
+          } else {
+            document.execCommand("insertText", false, "  ");
+          }
+        }
       });
 
       let lastEscTime = 0;
