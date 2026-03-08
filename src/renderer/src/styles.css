@@ -12,7 +12,7 @@
 html,
 body {
   height: 100%;
-  background: #1e1e1e;
+  background: transparent;
   position: relative;
 }
 
@@ -26,7 +26,7 @@ textarea {
   font-size: 14px;
   line-height: 1.6;
   padding: 16px;
-  border-color: #1e1e1e;
+  border-color: transparent;
   outline: none;
   resize: none;
   position: absolute;
@@ -51,7 +51,7 @@ textarea {
   top: 0;
   left: var(--gutter-width);
   z-index: 1;
-  background: #1e1e1e;
+  background: transparent;
   color: #b0b0b0;
 }
 
@@ -112,8 +112,8 @@ textarea::placeholder {
   width: var(--gutter-width);
   height: calc(100% - var(--statusbar-height));
   overflow: hidden;
-  background: #1e1e1e;
-  border-right: 1px solid #2a2a2a;
+  background: transparent;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
   z-index: 4;
   padding-top: 16px;
   font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
@@ -164,15 +164,15 @@ textarea::placeholder {
   left: 0;
   width: 100%;
   height: var(--statusbar-height);
-  background: #252526;
-  border-top: 1px solid #2a2a2a;
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
   font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
   font-size: 11px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.35);
   z-index: 10;
   user-select: none;
 }

@@ -12,6 +12,9 @@ function createWindow() {
     alwaysOnTop: true,
     skipTaskbar: true,
     resizable: true,
+    vibrancy: 'under-window',
+    visualEffectState: 'active',
+    backgroundColor: '#00000000',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
