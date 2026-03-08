@@ -113,7 +113,7 @@ textarea::placeholder {
   height: calc(100% - var(--statusbar-height));
   overflow: hidden;
   background: transparent;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: none;
   z-index: 4;
   padding-top: 16px;
   font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
@@ -165,7 +165,7 @@ textarea::placeholder {
   width: 100%;
   height: var(--statusbar-height);
   background: transparent;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
