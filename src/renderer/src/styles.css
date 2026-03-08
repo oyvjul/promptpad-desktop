@@ -134,6 +134,17 @@ textarea::placeholder {
   color: #c8c8c8;
 }
 
+@keyframes gradient-pulse {
+  0%, 100% {
+    background-position: 0% 50%;
+    opacity: 0.15;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 0.25;
+  }
+}
+
 #ascii-overlay {
   position: absolute;
   top: 0;
@@ -145,9 +156,19 @@ textarea::placeholder {
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  background: linear-gradient(135deg, rgba(150, 170, 200, 0.18), rgba(170, 155, 190, 0.18), rgba(190, 160, 175, 0.18));
+  background: linear-gradient(
+    135deg,
+    rgba(100, 180, 255, 0.6),
+    rgba(160, 100, 255, 0.6),
+    rgba(255, 100, 200, 0.6),
+    rgba(100, 220, 200, 0.6),
+    rgba(100, 180, 255, 0.6)
+  );
+  background-size: 300% 300%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  animation: gradient-pulse 8s ease-in-out infinite;
+  opacity: 0.2;
   font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
   font-size: 10px;
   line-height: 1.2;
