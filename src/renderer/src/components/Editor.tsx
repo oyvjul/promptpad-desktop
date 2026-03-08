@@ -2,6 +2,7 @@ import { useState, useRef, useMemo, useCallback, useEffect } from 'react'
 import { highlightMarkdown } from '../utils/highlightMarkdown'
 import { useDoubleEscape } from '../hooks/useDoubleEscape'
 import { useEditorSync } from '../hooks/useEditorSync'
+import { useTokenCount } from '../hooks/useTokenCount'
 import AsciiPlaceholder from './AsciiPlaceholder'
 import StatusBar from './StatusBar'
 
@@ -14,6 +15,7 @@ export default function Editor() {
 
   useDoubleEscape()
   useEditorSync(textareaRef, highlightRef, gutterRef)
+  const tokenCount = useTokenCount(value)
 
   const highlightedHtml = useMemo(() => highlightMarkdown(value) + '\n', [value])
 
@@ -94,7 +96,7 @@ export default function Editor() {
         spellCheck={false}
       />
       <AsciiPlaceholder visible={value.length === 0} />
-      <StatusBar charCount={value.length} lineCount={lineCount} />
+      <StatusBar charCount={value.length} lineCount={lineCount} tokenCount={tokenCount} />
     </>
   )
 }
