@@ -181,6 +181,11 @@ textarea::placeholder {
   display: none;
 }
 
+.ghost-suggestion {
+  color: rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+}
+
 #status-bar {
   position: fixed;
   bottom: 0;

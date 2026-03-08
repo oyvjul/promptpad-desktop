@@ -3,6 +3,7 @@ import { highlightMarkdown } from '../utils/highlightMarkdown'
 import { useDoubleEscape } from '../hooks/useDoubleEscape'
 import { useEditorSync } from '../hooks/useEditorSync'
 import { useTokenCount } from '../hooks/useTokenCount'
+import { useAutocomplete } from '../hooks/useAutocomplete'
 import AsciiPlaceholder from './AsciiPlaceholder'
 import StatusBar from './StatusBar'
 
@@ -13,11 +14,20 @@ export default function Editor() {
   const highlightRef = useRef<HTMLDivElement>(null)
   const gutterRef = useRef<HTMLDivElement>(null)
 
+  const [cursorAtEnd, setCursorAtEnd] = useState(true)
+
   useDoubleEscape()
   useEditorSync(textareaRef, highlightRef, gutterRef)
   const tokenCount = useTokenCount(value)
+  const { suggestion, clearSuggestion } = useAutocomplete(value, cursorAtEnd)
 
-  const highlightedHtml = useMemo(() => highlightMarkdown(value) + '\n', [value])
+  const highlightedHtml = useMemo(() => {
+    const html = highlightMarkdown(value)
+    if (suggestion) {
+      return html + '<span class="ghost-suggestion"> ' + suggestion.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>\n'
+    }
+    return html + '\n'
+  }, [value, suggestion])
 
   const lines = value.split('\n')
   const lineCount = lines.length
@@ -32,6 +42,7 @@ export default function Editor() {
     if (!textarea) return
     const line = textarea.value.substring(0, textarea.selectionStart).split('\n').length
     setCurrentLine(line)
+    setCursorAtEnd(textarea.selectionStart === textarea.value.length)
   }, [])
 
   const handleInput = useCallback(
@@ -46,27 +57,37 @@ export default function Editor() {
     updateCurrentLine()
   }, [updateCurrentLine])
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Tab') {
-      e.preventDefault()
-      const textarea = e.currentTarget
-      if (e.shiftKey) {
-        const start = textarea.selectionStart
-        const beforeCursor = textarea.value.substring(0, start)
-        const lineStart = beforeCursor.lastIndexOf('\n') + 1
-        const linePrefix = textarea.value.substring(lineStart, start)
-        const match = linePrefix.match(/^ {1,2}/)
-        if (match) {
-          const spaces = match[0].length
-          textarea.selectionStart = lineStart
-          textarea.selectionEnd = lineStart + spaces
-          document.execCommand('delete', false)
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Tab') {
+        e.preventDefault()
+        const textarea = e.currentTarget
+        if (!e.shiftKey && suggestion) {
+          // Accept autocomplete suggestion
+          const pos = textarea.selectionStart
+          textarea.selectionStart = pos
+          textarea.selectionEnd = pos
+          document.execCommand('insertText', false, ' ' + suggestion)
+          clearSuggestion()
+        } else if (e.shiftKey) {
+          const start = textarea.selectionStart
+          const beforeCursor = textarea.value.substring(0, start)
+          const lineStart = beforeCursor.lastIndexOf('\n') + 1
+          const linePrefix = textarea.value.substring(lineStart, start)
+          const match = linePrefix.match(/^ {1,2}/)
+          if (match) {
+            const spaces = match[0].length
+            textarea.selectionStart = lineStart
+            textarea.selectionEnd = lineStart + spaces
+            document.execCommand('delete', false)
+          }
+        } else {
+          document.execCommand('insertText', false, '  ')
         }
-      } else {
-        document.execCommand('insertText', false, '  ')
       }
-    }
-  }, [])
+    },
+    [suggestion, clearSuggestion]
+  )
 
   // Focus textarea on mount
   useEffect(() => {
