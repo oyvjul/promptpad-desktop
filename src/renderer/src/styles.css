@@ -1,16 +1,20 @@
-:root { --gutter-width: 50px; }
+:root {
+  --gutter-width: 50px;
+}
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 html,
 body {
   height: 100%;
   background: #1e1e1e;
   position: relative;
 }
+
 textarea {
   width: calc(100% - var(--gutter-width));
   height: 100%;
@@ -29,6 +33,7 @@ textarea {
   left: var(--gutter-width);
   z-index: 2;
 }
+
 #highlight-overlay {
   width: calc(100% - var(--gutter-width));
   height: 100%;
@@ -48,21 +53,57 @@ textarea {
   background: #1e1e1e;
   color: #b0b0b0;
 }
-.md-h1, .md-h2, .md-h3, .md-h4, .md-h5, .md-h6 { color: #e5c07b; font-weight: 500; }
-.md-h-marker { color: #7a6a3a; }
-.md-bold { color: #e0e0e0; font-weight: 500; }
-.md-italic { color: #c8a2d0; font-style: italic; }
-.md-code { color: #7ec8a0; background: rgba(255,255,255,0.04); }
-.md-link-text { color: #6ca6e8; }
-.md-link-url { color: #4a7aaa; }
-.md-list-marker { color: #6bb3b3; }
-.md-blockquote-marker { color: #7a5a3a; }
-.md-blockquote-text { color: #9a8a6a; }
-.md-hr { color: #555; }
-.md-dim { color: #555; }
+
+.md-h1,
+.md-h2,
+.md-h3,
+.md-h4,
+.md-h5,
+.md-h6 {
+  color: #e5c07b;
+  font-weight: 500;
+}
+.md-h-marker {
+  color: #7a6a3a;
+}
+.md-bold {
+  color: #e0e0e0;
+  font-weight: 500;
+}
+.md-italic {
+  color: #c8a2d0;
+  font-style: italic;
+}
+.md-code {
+  color: #7ec8a0;
+  background: rgba(255, 255, 255, 0.04);
+}
+.md-link-text {
+  color: #6ca6e8;
+}
+.md-link-url {
+  color: #4a7aaa;
+}
+.md-list-marker {
+  color: #6bb3b3;
+}
+.md-blockquote-marker {
+  color: #7a5a3a;
+}
+.md-blockquote-text {
+  color: #9a8a6a;
+}
+.md-hr {
+  color: #555;
+}
+.md-dim {
+  color: #555;
+}
+
 textarea::placeholder {
   color: transparent;
 }
+
 #line-gutter {
   position: absolute;
   top: 0;
@@ -80,15 +121,18 @@ textarea::placeholder {
   user-select: none;
   pointer-events: none;
 }
+
 .line-number {
   display: block;
   text-align: right;
   padding-right: 12px;
   color: #555;
 }
+
 .line-number.active {
   color: #c8c8c8;
 }
+
 #ascii-overlay {
   position: absolute;
   top: 0;
@@ -108,6 +152,7 @@ textarea::placeholder {
   margin: 0;
   padding: 0;
 }
+
 #ascii-overlay.hidden {
   display: none;
 }
