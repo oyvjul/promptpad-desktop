@@ -3,6 +3,7 @@ import { highlightMarkdown } from '../utils/highlightMarkdown'
 import { useDoubleEscape } from '../hooks/useDoubleEscape'
 import { useEditorSync } from '../hooks/useEditorSync'
 import AsciiPlaceholder from './AsciiPlaceholder'
+import StatusBar from './StatusBar'
 
 export default function Editor() {
   const [value, setValue] = useState('')
@@ -93,6 +94,7 @@ export default function Editor() {
         spellCheck={false}
       />
       <AsciiPlaceholder visible={value.length === 0} />
+      <StatusBar charCount={value.length} lineCount={lineCount} />
     </>
   )
 }

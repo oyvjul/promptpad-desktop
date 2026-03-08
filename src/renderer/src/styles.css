@@ -1,5 +1,6 @@
 :root {
   --gutter-width: 50px;
+  --statusbar-height: 24px;
 }
 
 * {
@@ -17,7 +18,7 @@ body {
 
 textarea {
   width: calc(100% - var(--gutter-width));
-  height: 100%;
+  height: calc(100% - var(--statusbar-height));
   background: transparent;
   color: transparent;
   caret-color: #b0b0b0;
@@ -36,7 +37,7 @@ textarea {
 
 #highlight-overlay {
   width: calc(100% - var(--gutter-width));
-  height: 100%;
+  height: calc(100% - var(--statusbar-height));
   font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
   font-size: 14px;
   line-height: 1.6;
@@ -109,7 +110,7 @@ textarea::placeholder {
   top: 0;
   left: 0;
   width: var(--gutter-width);
-  height: 100%;
+  height: calc(100% - var(--statusbar-height));
   overflow: hidden;
   background: #1e1e1e;
   border-right: 1px solid #2a2a2a;
@@ -139,7 +140,7 @@ textarea::placeholder {
   left: var(--gutter-width);
   z-index: 3;
   width: calc(100% - var(--gutter-width));
-  height: 100%;
+  height: calc(100% - var(--statusbar-height));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -155,4 +156,23 @@ textarea::placeholder {
 
 #ascii-overlay.hidden {
   display: none;
+}
+
+#status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--statusbar-height);
+  background: #252526;
+  border-top: 1px solid #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
+  font-size: 11px;
+  color: #666;
+  z-index: 10;
+  user-select: none;
 }
