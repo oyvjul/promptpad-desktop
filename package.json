@@ -1,12 +1,22 @@
 {
   "name": "promptpad",
   "version": "1.0.0",
-  "main": "src/main.js",
+  "main": "./out/main/index.js",
   "scripts": {
-    "start": "electron .",
-    "dev": "ELECTRON_ENABLE_LOGGING=1 electron ."
+    "start": "electron-vite preview",
+    "dev": "electron-vite dev",
+    "build": "electron-vite build"
   },
   "devDependencies": {
-    "electron": "^33.0.0"
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "electron": "^33.0.0",
+    "electron-vite": "^5.0.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   }
 }

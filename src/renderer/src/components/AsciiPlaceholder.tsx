@@ -10,11 +10,16 @@ const ASCII_ART = `\
                ██████╔╝███████║██║  ██║
                ██╔═══╝ ██╔══██║██║  ██║
                ██║     ██║  ██║██████╔╝
-               ╚═╝     ╚═╝  ╚═╝╚═════╝`;
+               ╚═╝     ╚═╝  ╚═╝╚═════╝`
 
-const overlay = document.getElementById("ascii-overlay");
-overlay.textContent = ASCII_ART;
+interface AsciiPlaceholderProps {
+  visible: boolean
+}
 
-function updatePlaceholderVisibility(hasContent) {
-  overlay.classList.toggle("hidden", hasContent);
+export default function AsciiPlaceholder({ visible }: AsciiPlaceholderProps) {
+  return (
+    <pre id="ascii-overlay" className={visible ? undefined : 'hidden'}>
+      {ASCII_ART}
+    </pre>
+  )
 }
