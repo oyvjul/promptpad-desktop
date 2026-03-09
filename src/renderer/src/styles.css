@@ -26,9 +26,10 @@ textarea {
   font-size: 14px;
   line-height: 1.6;
   padding: 16px;
-  border-color: transparent;
+  border: none;
   outline: none;
   resize: none;
+  scrollbar-width: none;
   position: absolute;
   top: 0;
   left: var(--gutter-width);
@@ -178,6 +179,12 @@ textarea::placeholder {
 }
 
 #ascii-overlay.hidden {
+  visibility: hidden;
+  opacity: 0;
+  animation: none;
+}
+
+textarea::-webkit-scrollbar {
   display: none;
 }
 
