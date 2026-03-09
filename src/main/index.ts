@@ -11,24 +11,24 @@ import { join } from "path";
 let win: BrowserWindow;
 
 function getPlatformOptions() {
-  if (process.platform === 'darwin') {
+  if (process.platform === "darwin") {
     return {
-      vibrancy: 'under-window' as const,
-      visualEffectState: 'active' as const,
-      backgroundColor: '#00000000',
+      vibrancy: "under-window" as const,
+      visualEffectState: "active" as const,
+      backgroundColor: "#00000000",
     };
   }
-  if (process.platform === 'win32') {
+  if (process.platform === "win32") {
     return {
-      backgroundColor: '#121218e6',
-      backgroundMaterial: 'acrylic' as const,
+      backgroundColor: "#00000000",
+      backgroundMaterial: "acrylic" as const,
       // DO NOT set transparent: true — it conflicts with backgroundMaterial
     };
   }
   // Linux: plain transparency, no blur API available
   return {
     transparent: true,
-    backgroundColor: '#00000000',
+    backgroundColor: "#00000000",
   };
 }
 
@@ -61,24 +61,24 @@ function createWindow() {
 
   // Workaround for Electron < 36 frameless backgroundMaterial bug:
   // DWM composition doesn't apply until a resize triggers recomposition.
-  win.once('ready-to-show', () => {
-    if (process.platform === 'win32') {
+  win.once("ready-to-show", () => {
+    if (process.platform === "win32") {
       const bounds = win.getBounds();
       win.setBounds({ width: bounds.width + 1 });
       win.setBounds({ width: bounds.width });
     }
   });
 
-  win.on('show', () => {
+  win.on("show", () => {
     // Reapply resize nudge on show — acrylic can vanish after hide/show cycles
-    if (process.platform === 'win32') {
+    if (process.platform === "win32") {
       const bounds = win.getBounds();
       win.setBounds({ width: bounds.width + 1 });
       win.setBounds({ width: bounds.width });
     }
     win.webContents.focus();
     win.webContents.executeJavaScript(
-      'document.querySelector("textarea")?.focus()'
+      'document.querySelector("textarea")?.focus()',
     );
   });
 }
