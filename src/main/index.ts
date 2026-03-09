@@ -20,7 +20,7 @@ const platformOptions = isMac
     }
   : {
       transparent: true,
-      backgroundColor: '#D01e1e1e',
+      backgroundColor: '#00000000',
       backgroundMaterial: 'acrylic' as const,
     };
 
@@ -40,6 +40,13 @@ function createWindow() {
       preload: join(__dirname, "../preload/index.js"),
     },
   });
+
+  if (!isMac) {
+    const buildNumber = parseInt(require('os').release().split('.')[2], 10);
+    if (buildNumber < 22621) {
+      win.setBackgroundColor('#FF1a1a1a');
+    }
+  }
 
   if (process.env.ELECTRON_RENDERER_URL) {
     win.loadURL(process.env.ELECTRON_RENDERER_URL);
