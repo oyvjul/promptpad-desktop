@@ -16,15 +16,6 @@ body {
   position: relative;
 }
 
-body.platform-win::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 15, 15, 0.65);
-  z-index: 0;
-  pointer-events: none;
-}
-
 textarea {
   width: calc(100% - var(--gutter-width));
   height: calc(100% - var(--statusbar-height));
