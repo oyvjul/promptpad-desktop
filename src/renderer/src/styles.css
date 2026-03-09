@@ -21,23 +21,14 @@ textarea {
   height: calc(100% - var(--statusbar-height));
   background: transparent;
   color: transparent;
-  -webkit-text-fill-color: transparent;
   caret-color: #b0b0b0;
-  -webkit-text-stroke-width: 0;
-  text-shadow: none;
   font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
   font-size: 14px;
   line-height: 1.6;
   padding: 16px;
-  border: none;
+  border-color: transparent;
   outline: none;
   resize: none;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  scrollbar-width: none;
   position: absolute;
   top: 0;
   left: var(--gutter-width);
@@ -108,12 +99,6 @@ textarea {
 }
 .md-dim {
   color: #555;
-}
-
-textarea::selection {
-  background: rgba(100, 150, 255, 0.25);
-  color: transparent;
-  -webkit-text-fill-color: transparent;
 }
 
 textarea::placeholder {
@@ -192,7 +177,7 @@ textarea::placeholder {
   padding: 0;
 }
 
-textarea::-webkit-scrollbar {
+#ascii-overlay.hidden {
   display: none;
 }
 
