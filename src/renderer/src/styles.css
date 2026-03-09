@@ -23,6 +23,8 @@ textarea {
   color: transparent;
   -webkit-text-fill-color: transparent;
   caret-color: #b0b0b0;
+  -webkit-text-stroke-width: 0;
+  text-shadow: none;
   font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
   font-size: 14px;
   line-height: 1.6;
@@ -106,6 +108,12 @@ textarea {
 }
 .md-dim {
   color: #555;
+}
+
+textarea::selection {
+  background: rgba(100, 150, 255, 0.25);
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 textarea::placeholder {
