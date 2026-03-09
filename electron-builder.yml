@@ -1,0 +1,30 @@
+appId: com.promptpad.app
+productName: Promptpad
+
+directories:
+  buildResources: build
+  output: dist
+
+files:
+  - out/**/*
+
+mac:
+  category: public.app-category.productivity
+  target: dmg
+  darkModeSupport: true
+
+dmg:
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
+
+win:
+  target: nsis
+
+nsis:
+  oneClick: true
+  perMachine: false
