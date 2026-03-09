@@ -3,12 +3,9 @@
   "version": "1.0.0",
   "main": "./out/main/index.js",
   "scripts": {
-    "dev": "electron-vite dev",
-    "build": "electron-vite build",
     "start": "electron-vite preview",
-    "clean": "node -e \"require('fs').rmSync('out',{recursive:true,force:true})\"",
-    "rebuild": "npm run clean && npm run build",
-    "prestart": "npm run build"
+    "dev": "electron-vite dev",
+    "build": "electron-vite build"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
