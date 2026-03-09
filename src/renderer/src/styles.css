@@ -1,7 +1,7 @@
 :root {
   --gutter-width: 50px;
   --statusbar-height: 24px;
-  --titlebar-height: 32px;
+  --titlebar-height: 24px;
 }
 
 * {
