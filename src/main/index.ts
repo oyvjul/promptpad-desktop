@@ -9,6 +9,7 @@ import {
 import { join } from "path";
 
 let win: BrowserWindow;
+let isMinimizing = false;
 
 function getPlatformOptions() {
   if (process.platform === "darwin") {
@@ -56,6 +57,7 @@ function createWindow() {
   }
 
   win.on("blur", () => {
+    if (isMinimizing) return;
     copyAndHide();
   });
 
@@ -115,6 +117,16 @@ app.whenReady().then(() => {
 
 ipcMain.on("app-hide", () => {
   copyAndHide();
+});
+
+ipcMain.on("app-minimize", () => {
+  isMinimizing = true;
+  win.minimize();
+  setTimeout(() => { isMinimizing = false; }, 100);
+});
+
+ipcMain.on("app-maximize", () => {
+  win.isMaximized() ? win.unmaximize() : win.maximize();
 });
 
 app.on("will-quit", () => {

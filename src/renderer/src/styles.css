@@ -1,6 +1,7 @@
 :root {
   --gutter-width: 50px;
   --statusbar-height: 24px;
+  --titlebar-height: 32px;
 }
 
 * {
@@ -18,7 +19,7 @@ body {
 
 textarea {
   width: calc(100% - var(--gutter-width));
-  height: calc(100% - var(--statusbar-height));
+  height: calc(100% - var(--statusbar-height) - var(--titlebar-height));
   background: transparent;
   color: transparent;
   caret-color: #b0b0b0;
@@ -30,14 +31,14 @@ textarea {
   outline: none;
   resize: none;
   position: absolute;
-  top: 0;
+  top: var(--titlebar-height);
   left: var(--gutter-width);
   z-index: 2;
 }
 
 #highlight-overlay {
   width: calc(100% - var(--gutter-width));
-  height: calc(100% - var(--statusbar-height));
+  height: calc(100% - var(--statusbar-height) - var(--titlebar-height));
   font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
   font-size: 14px;
   line-height: 1.6;
@@ -48,7 +49,7 @@ textarea {
   overflow: hidden;
   pointer-events: none;
   position: absolute;
-  top: 0;
+  top: var(--titlebar-height);
   left: var(--gutter-width);
   z-index: 1;
   background: transparent;
@@ -107,10 +108,10 @@ textarea::placeholder {
 
 #line-gutter {
   position: absolute;
-  top: 0;
+  top: var(--titlebar-height);
   left: 0;
   width: var(--gutter-width);
-  height: calc(100% - var(--statusbar-height));
+  height: calc(100% - var(--statusbar-height) - var(--titlebar-height));
   overflow: hidden;
   background: transparent;
   border-right: none;
@@ -147,11 +148,11 @@ textarea::placeholder {
 
 #ascii-overlay {
   position: absolute;
-  top: 0;
+  top: var(--titlebar-height);
   left: var(--gutter-width);
   z-index: 3;
   width: calc(100% - var(--gutter-width));
-  height: calc(100% - var(--statusbar-height));
+  height: calc(100% - var(--statusbar-height) - var(--titlebar-height));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -179,6 +180,54 @@ textarea::placeholder {
 
 #ascii-overlay.hidden {
   display: none;
+}
+
+#title-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--titlebar-height);
+  display: flex;
+  z-index: 20;
+  background: transparent;
+}
+
+#drag-region {
+  flex: 1;
+  -webkit-app-region: drag;
+}
+
+#window-controls {
+  display: flex;
+  -webkit-app-region: no-drag;
+}
+
+.win-ctrl {
+  width: 46px;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.win-ctrl:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+#btn-close:hover {
+  background: #e81123;
+  color: #fff;
+}
+
+.win-ctrl svg {
+  width: 10px;
+  height: 10px;
 }
 
 #status-bar {

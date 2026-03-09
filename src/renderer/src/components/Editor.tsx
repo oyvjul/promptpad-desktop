@@ -5,6 +5,7 @@ import { useEditorSync } from "../hooks/useEditorSync";
 import { useTokenCount } from "../hooks/useTokenCount";
 import StatusBar from "./StatusBar";
 import AsciiPlaceholder from "./AsciiPlaceholder";
+import TitleBar from "./TitleBar";
 
 export default function Editor() {
   const [value, setValue] = useState("");
@@ -86,6 +87,7 @@ export default function Editor() {
 
   return (
     <>
+      <TitleBar />
       <div id="line-gutter" ref={gutterRef}>
         {Array.from({ length: lineCount }, (_, i) => (
           <span
