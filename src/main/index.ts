@@ -9,6 +9,29 @@ import {
 import { join } from "path";
 
 let win: BrowserWindow;
+let isMinimizing = false;
+
+function getPlatformOptions() {
+  if (process.platform === "darwin") {
+    return {
+      vibrancy: "under-window" as const,
+      visualEffectState: "active" as const,
+      backgroundColor: "#00000000",
+    };
+  }
+  if (process.platform === "win32") {
+    return {
+      backgroundColor: "#00000000",
+      backgroundMaterial: "mica" as const,
+      // DO NOT set transparent: true — it conflicts with backgroundMaterial
+    };
+  }
+  // Linux: plain transparency, no blur API available
+  return {
+    transparent: true,
+    backgroundColor: "#00000000",
+  };
+}
 
 function createWindow() {
   win = new BrowserWindow({
@@ -19,9 +42,7 @@ function createWindow() {
     alwaysOnTop: true,
     skipTaskbar: true,
     resizable: true,
-    vibrancy: "under-window",
-    visualEffectState: "active",
-    backgroundColor: "#00000000",
+    ...getPlatformOptions(),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -36,7 +57,31 @@ function createWindow() {
   }
 
   win.on("blur", () => {
+    if (isMinimizing) return;
     copyAndHide();
+  });
+
+  // Workaround for Electron < 36 frameless backgroundMaterial bug:
+  // DWM composition doesn't apply until a resize triggers recomposition.
+  win.once("ready-to-show", () => {
+    if (process.platform === "win32") {
+      const bounds = win.getBounds();
+      win.setBounds({ width: bounds.width + 1 });
+      win.setBounds({ width: bounds.width });
+    }
+  });
+
+  win.on("show", () => {
+    // Reapply resize nudge on show — acrylic can vanish after hide/show cycles
+    if (process.platform === "win32") {
+      const bounds = win.getBounds();
+      win.setBounds({ width: bounds.width + 1 });
+      win.setBounds({ width: bounds.width });
+    }
+    win.webContents.focus();
+    win.webContents.executeJavaScript(
+      'document.querySelector("textarea")?.focus()',
+    );
   });
 }
 
@@ -72,6 +117,16 @@ app.whenReady().then(() => {
 
 ipcMain.on("app-hide", () => {
   copyAndHide();
+});
+
+ipcMain.on("app-minimize", () => {
+  isMinimizing = true;
+  win.minimize();
+  setTimeout(() => { isMinimizing = false; }, 100);
+});
+
+ipcMain.on("app-maximize", () => {
+  win.isMaximized() ? win.unmaximize() : win.maximize();
 });
 
 app.on("will-quit", () => {

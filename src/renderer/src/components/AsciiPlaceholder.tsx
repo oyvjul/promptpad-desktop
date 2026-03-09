@@ -10,16 +10,16 @@ const ASCII_ART = `\
                ██████╔╝███████║██║  ██║
                ██╔═══╝ ██╔══██║██║  ██║
                ██║     ██║  ██║██████╔╝
-               ╚═╝     ╚═╝  ╚═╝╚═════╝`
+               ╚═╝     ╚═╝  ╚═╝╚═════╝`;
 
 interface AsciiPlaceholderProps {
-  visible: boolean
+  visible: boolean;
 }
 
 export default function AsciiPlaceholder({ visible }: AsciiPlaceholderProps) {
-  return (
-    <pre id="ascii-overlay" className={visible ? undefined : 'hidden'}>
-      {ASCII_ART}
-    </pre>
-  )
+  if (!visible) {
+    return null;
+  }
+
+  return <pre id="ascii-overlay">{ASCII_ART}</pre>;
 }
