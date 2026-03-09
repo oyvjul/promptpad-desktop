@@ -21,8 +21,6 @@ const ASCII_ART = `\
 
 export default function Editor() {
   const [value, setValue] = useState("");
-  console.info("🚀 ~ Editor ~ value:", value);
-  console.info("🚀 ~ Editor ~ value2222:", value.length);
   const [currentLine, setCurrentLine] = useState(1);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
@@ -38,7 +36,6 @@ export default function Editor() {
   );
 
   const lines = value.split("\n");
-  console.info("🚀 ~ Editor ~ lines:", lines);
   const lineCount = lines.length;
   const digits = Math.max(2, String(lineCount).length);
 

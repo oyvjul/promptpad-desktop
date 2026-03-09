@@ -10,6 +10,18 @@ import { join } from "path";
 
 let win: BrowserWindow;
 
+const isMac = process.platform === 'darwin';
+
+const platformOptions = isMac
+  ? {
+      vibrancy: 'under-window' as const,
+      visualEffectState: 'active' as const,
+      backgroundColor: '#00000000',
+    }
+  : {
+      backgroundColor: '#1e1e1e',
+    };
+
 function createWindow() {
   win = new BrowserWindow({
     width: 800,
@@ -19,9 +31,7 @@ function createWindow() {
     alwaysOnTop: true,
     skipTaskbar: true,
     resizable: true,
-    vibrancy: "under-window",
-    visualEffectState: "active",
-    backgroundColor: "#00000000",
+    ...platformOptions,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -37,6 +47,13 @@ function createWindow() {
 
   win.on("blur", () => {
     copyAndHide();
+  });
+
+  win.on('show', () => {
+    win.webContents.focus();
+    win.webContents.executeJavaScript(
+      'document.querySelector("textarea")?.focus()'
+    );
   });
 }
 
