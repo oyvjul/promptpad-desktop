@@ -19,7 +19,9 @@ const platformOptions = isMac
       backgroundColor: '#00000000',
     }
   : {
-      backgroundColor: '#1e1e1e',
+      transparent: true,
+      backgroundColor: '#00000000',
+      backgroundMaterial: 'acrylic' as const,
     };
 
 function createWindow() {
