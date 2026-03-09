@@ -1,7 +1,7 @@
 :root {
   --gutter-width: 50px;
   --statusbar-height: 24px;
-  --titlebar-height: 24px;
+  --titlebar-height: 32px;
 }
 
 * {
@@ -26,7 +26,7 @@ textarea {
   font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
   font-size: 14px;
   line-height: 1.6;
-  padding: 16px;
+  padding: 0 16px;
   border-color: transparent;
   outline: none;
   resize: none;
@@ -42,7 +42,7 @@ textarea {
   font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
   font-size: 14px;
   line-height: 1.6;
-  padding: 16px;
+  padding: 0 16px;
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -116,7 +116,7 @@ textarea::placeholder {
   background: transparent;
   border-right: none;
   z-index: 4;
-  padding-top: 16px;
+  padding-top: 0 16px;
   font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
   font-size: 14px;
   line-height: 1.6;
@@ -136,7 +136,8 @@ textarea::placeholder {
 }
 
 @keyframes gradient-pulse {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
     opacity: 0.22;
   }
