@@ -17,8 +17,9 @@ interface AsciiPlaceholderProps {
 }
 
 export default function AsciiPlaceholder({ visible }: AsciiPlaceholderProps) {
+  if (!visible) return null
   return (
-    <pre id="ascii-overlay" className={visible ? undefined : 'hidden'}>
+    <pre id="ascii-overlay">
       {ASCII_ART}
     </pre>
   )
