@@ -21,6 +21,7 @@ textarea {
   height: calc(100% - var(--statusbar-height));
   background: transparent;
   color: transparent;
+  -webkit-text-fill-color: transparent;
   caret-color: #b0b0b0;
   font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
   font-size: 14px;
