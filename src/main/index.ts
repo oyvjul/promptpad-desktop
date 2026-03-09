@@ -65,7 +65,7 @@ function toggleWindow() {
 }
 
 app.whenReady().then(() => {
-  app.dock.hide();
+  app.dock?.hide();
   createWindow();
   globalShortcut.register("CommandOrControl+Shift+P", toggleWindow);
 });
