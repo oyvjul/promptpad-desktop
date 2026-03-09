@@ -10,19 +10,27 @@ import { join } from "path";
 
 let win: BrowserWindow;
 
-const isMac = process.platform === 'darwin';
-
-const platformOptions = isMac
-  ? {
+function getPlatformOptions() {
+  if (process.platform === 'darwin') {
+    return {
       vibrancy: 'under-window' as const,
       visualEffectState: 'active' as const,
       backgroundColor: '#00000000',
-    }
-  : {
-      transparent: true,
-      backgroundColor: '#D01e1e1e',
-      backgroundMaterial: 'acrylic' as const,
     };
+  }
+  if (process.platform === 'win32') {
+    return {
+      backgroundColor: '#00000000',
+      backgroundMaterial: 'acrylic' as const,
+      // DO NOT set transparent: true — it conflicts with backgroundMaterial
+    };
+  }
+  // Linux: plain transparency, no blur API available
+  return {
+    transparent: true,
+    backgroundColor: '#00000000',
+  };
+}
 
 function createWindow() {
   win = new BrowserWindow({
@@ -33,7 +41,7 @@ function createWindow() {
     alwaysOnTop: true,
     skipTaskbar: true,
     resizable: true,
-    ...platformOptions,
+    ...getPlatformOptions(),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -51,7 +59,23 @@ function createWindow() {
     copyAndHide();
   });
 
+  // Workaround for Electron < 36 frameless backgroundMaterial bug:
+  // DWM composition doesn't apply until a resize triggers recomposition.
+  win.once('ready-to-show', () => {
+    if (process.platform === 'win32') {
+      const bounds = win.getBounds();
+      win.setBounds({ width: bounds.width + 1 });
+      win.setBounds({ width: bounds.width });
+    }
+  });
+
   win.on('show', () => {
+    // Reapply resize nudge on show — acrylic can vanish after hide/show cycles
+    if (process.platform === 'win32') {
+      const bounds = win.getBounds();
+      win.setBounds({ width: bounds.width + 1 });
+      win.setBounds({ width: bounds.width });
+    }
     win.webContents.focus();
     win.webContents.executeJavaScript(
       'document.querySelector("textarea")?.focus()'
