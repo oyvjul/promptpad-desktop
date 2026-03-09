@@ -3,6 +3,7 @@ interface ElectronAPI {
   hideApp: () => void
   minimizeApp: () => void
   maximizeApp: () => void
+  platform: string
 }
 
 declare global {
