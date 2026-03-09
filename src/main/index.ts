@@ -20,7 +20,7 @@ function getPlatformOptions() {
   }
   if (process.platform === 'win32') {
     return {
-      backgroundColor: '#00000000',
+      backgroundColor: '#121218e6',
       backgroundMaterial: 'acrylic' as const,
       // DO NOT set transparent: true — it conflicts with backgroundMaterial
     };
