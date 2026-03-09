@@ -20,7 +20,7 @@ const platformOptions = isMac
     }
   : {
       transparent: true,
-      backgroundColor: '#00000000',
+      backgroundColor: '#D01e1e1e',
       backgroundMaterial: 'acrylic' as const,
     };
 
