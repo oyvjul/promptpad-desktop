@@ -56,10 +56,6 @@ function createWindow() {
     win.loadFile(join(__dirname, "../renderer/index.html"));
   }
 
-  win.on("blur", () => {
-    if (isMinimizing) return;
-    copyAndHide();
-  });
 
   // Workaround for Electron < 36 frameless backgroundMaterial bug:
   // DWM composition doesn't apply until a resize triggers recomposition.
@@ -117,7 +113,7 @@ function toggleWindow() {
 app.whenReady().then(() => {
   app.dock?.hide();
   createWindow();
-  globalShortcut.register("CommandOrControl+Shift+P", toggleWindow);
+  globalShortcut.register("Ctrl+Space", toggleWindow);
 });
 
 ipcMain.on("app-hide", () => {
