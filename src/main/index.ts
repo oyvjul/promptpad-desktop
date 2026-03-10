@@ -95,16 +95,21 @@ function copyAndHide() {
     .catch(() => win.hide());
 }
 
+let hasBeenShown = false;
+
 function toggleWindow() {
   if (win.isVisible()) {
     copyAndHide();
   } else {
-    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-    const bounds = win.getBounds();
-    win.setPosition(
-      Math.round((width - bounds.width) / 2),
-      Math.round((height - bounds.height) / 2),
-    );
+    if (!hasBeenShown) {
+      const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+      const bounds = win.getBounds();
+      win.setPosition(
+        Math.round((width - bounds.width) / 2),
+        Math.round((height - bounds.height) / 2),
+      );
+      hasBeenShown = true;
+    }
     win.show();
   }
 }
