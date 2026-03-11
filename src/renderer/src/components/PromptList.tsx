@@ -13,7 +13,6 @@ interface PromptListProps {
   currentPromptId: string | null
   onLoad: (id: string) => void
   onDelete: (id: string) => void
-  onNew: () => void
   onClose: () => void
 }
 
@@ -35,7 +34,6 @@ export default function PromptList({
   currentPromptId,
   onLoad,
   onDelete,
-  onNew,
   onClose,
 }: PromptListProps) {
   const [open, setOpen] = useState(false)
@@ -61,12 +59,6 @@ export default function PromptList({
     <>
       <div className="prompt-list-backdrop" onClick={onClose} />
       <div id="prompt-list" className={open ? 'open' : ''}>
-        <div className="prompt-list-header">
-          <span>Prompts</span>
-          <button className="prompt-list-new" onClick={onNew}>
-            + New
-          </button>
-        </div>
         <div className="prompt-list-items">
           {sorted.length === 0 && (
             <div className="prompt-list-empty">No saved prompts</div>

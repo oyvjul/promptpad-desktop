@@ -175,7 +175,6 @@ export default function Editor() {
           currentPromptId={storage.currentPromptId}
           onLoad={handleLoadPrompt}
           onDelete={storage.remove}
-          onNew={handleNewPrompt}
           onClose={() => setShowPromptList(false)}
         />
       )}
