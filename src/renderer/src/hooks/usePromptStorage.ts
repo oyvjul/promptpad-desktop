@@ -42,6 +42,14 @@ export function usePromptStorage() {
     return prompt
   }, [refresh])
 
+  const silentUpdate = useCallback(async (id: string, fields: { title?: string; content?: string }) => {
+    const prompt = await window.electronAPI.prompts.update(id, fields)
+    if (prompt) {
+      setCurrentTitle(prompt.title)
+    }
+    return prompt
+  }, [])
+
   const load = useCallback(async (id: string) => {
     const prompt = await window.electronAPI.prompts.load(id)
     if (prompt) {
@@ -62,6 +70,15 @@ export function usePromptStorage() {
     await refresh()
   }, [currentPromptId, refresh])
 
+  const loadLatest = useCallback(async () => {
+    const list = await window.electronAPI.prompts.list()
+    if (list.length === 0) return null
+    const sorted = [...list].sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    )
+    return load(sorted[0].id)
+  }, [load])
+
   const clearCurrent = useCallback(() => {
     setCurrentPromptId(null)
     setCurrentTitle(null)
@@ -76,8 +93,10 @@ export function usePromptStorage() {
     refresh,
     save,
     update,
+    silentUpdate,
     load,
     remove,
+    loadLatest,
     clearCurrent,
   }
 }

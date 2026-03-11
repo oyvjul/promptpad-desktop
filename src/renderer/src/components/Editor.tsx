@@ -7,17 +7,17 @@ import { usePromptStorage } from "../hooks/usePromptStorage";
 import StatusBar from "./StatusBar";
 import AsciiPlaceholder from "./AsciiPlaceholder";
 import TitleBar from "./TitleBar";
-import SaveDialog from "./SaveDialog";
 import PromptList from "./PromptList";
 
 export default function Editor() {
   const [value, setValue] = useState("");
   const [currentLine, setCurrentLine] = useState(1);
-  const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showPromptList, setShowPromptList] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
   const gutterRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const skipNextAutoSaveRef = useRef(false);
 
   useDoubleEscape();
   useEditorSync(textareaRef, highlightRef, gutterRef);
@@ -40,6 +40,37 @@ export default function Editor() {
     );
   }, [digits]);
 
+  const deriveTitle = useCallback((text: string) => {
+    const firstLine = text.split("\n")[0].replace(/^#+\s*/, "").trim();
+    return firstLine.slice(0, 60) || "Untitled";
+  }, []);
+
+  // Auto-save with debounce
+  useEffect(() => {
+    if (skipNextAutoSaveRef.current) {
+      skipNextAutoSaveRef.current = false;
+      return;
+    }
+
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = setTimeout(() => {
+      if (storage.currentPromptId) {
+        storage.silentUpdate(storage.currentPromptId, { content: value });
+      } else if (value.trim()) {
+        storage.save(deriveTitle(value), value);
+      }
+    }, 1000);
+
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, [value]);
+
   const updateCurrentLine = useCallback(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
@@ -61,39 +92,11 @@ export default function Editor() {
     updateCurrentLine();
   }, [updateCurrentLine]);
 
-  const deriveTitle = useCallback((text: string) => {
-    const firstLine = text.split("\n")[0].replace(/^#+\s*/, "").trim();
-    return firstLine.slice(0, 60) || "Untitled";
-  }, []);
-
-  const handleSave = useCallback(() => {
-    if (storage.currentPromptId) {
-      storage.update(storage.currentPromptId, { content: value });
-    } else {
-      if (value.trim()) {
-        setShowSaveDialog(true);
-      }
-    }
-  }, [storage, value]);
-
-  const handleSaveConfirm = useCallback(
-    (title: string) => {
-      setShowSaveDialog(false);
-      storage.save(title, value);
-      textareaRef.current?.focus();
-    },
-    [storage, value],
-  );
-
-  const handleSaveCancel = useCallback(() => {
-    setShowSaveDialog(false);
-    textareaRef.current?.focus();
-  }, []);
-
   const handleLoadPrompt = useCallback(
     async (id: string) => {
       const prompt = await storage.load(id);
       if (prompt) {
+        skipNextAutoSaveRef.current = true;
         setValue(prompt.content);
         setShowPromptList(false);
         textareaRef.current?.focus();
@@ -103,6 +106,7 @@ export default function Editor() {
   );
 
   const handleNewPrompt = useCallback(() => {
+    skipNextAutoSaveRef.current = true;
     setValue("");
     storage.clearCurrent();
     setShowPromptList(false);
@@ -137,33 +141,34 @@ export default function Editor() {
           document.execCommand("insertText", false, "  ");
         }
       }
-      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
-        e.preventDefault();
-        handleSave();
-      }
       if ((e.metaKey || e.ctrlKey) && e.key === "o") {
         e.preventDefault();
         togglePromptList();
       }
+      if ((e.metaKey || e.ctrlKey) && e.key === "n") {
+        e.preventDefault();
+        handleNewPrompt();
+      }
     },
-    [handleSave, togglePromptList],
+    [togglePromptList, handleNewPrompt],
   );
 
-  // Focus textarea on mount
+  // Load most recent prompt on mount
   useEffect(() => {
-    textareaRef.current?.focus();
+    skipNextAutoSaveRef.current = true;
+    storage.loadLatest().then((prompt) => {
+      if (prompt) {
+        setValue(prompt.content);
+      } else {
+        skipNextAutoSaveRef.current = false;
+      }
+      textareaRef.current?.focus();
+    });
   }, []);
 
   return (
     <>
       <TitleBar onTogglePromptList={togglePromptList} />
-      {showSaveDialog && (
-        <SaveDialog
-          defaultTitle={deriveTitle(value)}
-          onSave={handleSaveConfirm}
-          onCancel={handleSaveCancel}
-        />
-      )}
       {showPromptList && (
         <PromptList
           prompts={storage.prompts}

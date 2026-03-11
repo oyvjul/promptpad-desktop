@@ -91,16 +91,17 @@ function createWindow() {
 function copyAndHide() {
   win.webContents
     .executeJavaScript(
-      '({ text: document.querySelector("textarea").value.trim(), promptId: window.__currentPromptId || null })',
+      'document.querySelector("textarea").value.trim()',
     )
-    .then(({ text, promptId }: { text: string; promptId: string | null }) => {
+    .then((text: string) => {
       if (text) clipboard.writeText(text);
-      if (text && promptId) {
-        updatePrompt(promptId, { content: text });
-      }
       win.hide();
+      if (process.platform === 'darwin') app.hide();
     })
-    .catch(() => win.hide());
+    .catch(() => {
+      win.hide();
+      if (process.platform === 'darwin') app.hide();
+    });
 }
 
 let hasBeenShown = false;
@@ -123,7 +124,6 @@ function toggleWindow() {
 }
 
 app.whenReady().then(() => {
-  app.dock?.hide();
   loadPrompts();
   createWindow();
   globalShortcut.register("Ctrl+Space", toggleWindow);
