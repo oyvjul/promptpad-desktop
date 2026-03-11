@@ -7,6 +7,13 @@ import {
   ipcMain,
 } from "electron";
 import { join } from "path";
+import {
+  loadPrompts,
+  savePrompt,
+  updatePrompt,
+  deletePrompt,
+  getPrompt,
+} from "./storage";
 
 let win: BrowserWindow;
 let isMinimizing = false;
@@ -83,9 +90,14 @@ function createWindow() {
 
 function copyAndHide() {
   win.webContents
-    .executeJavaScript('document.querySelector("textarea").value.trim()')
-    .then((text: string) => {
+    .executeJavaScript(
+      '({ text: document.querySelector("textarea").value.trim(), promptId: window.__currentPromptId || null })',
+    )
+    .then(({ text, promptId }: { text: string; promptId: string | null }) => {
       if (text) clipboard.writeText(text);
+      if (text && promptId) {
+        updatePrompt(promptId, { content: text });
+      }
       win.hide();
     })
     .catch(() => win.hide());
@@ -112,9 +124,18 @@ function toggleWindow() {
 
 app.whenReady().then(() => {
   app.dock?.hide();
+  loadPrompts();
   createWindow();
   globalShortcut.register("Ctrl+Space", toggleWindow);
 });
+
+ipcMain.handle("prompts:list", () => loadPrompts());
+ipcMain.handle("prompts:save", (_e, { title, content }) => savePrompt(title, content));
+ipcMain.handle("prompts:update", (_e, { id, title, content }) =>
+  updatePrompt(id, { title, content }),
+);
+ipcMain.handle("prompts:delete", (_e, { id }) => deletePrompt(id));
+ipcMain.handle("prompts:load", (_e, { id }) => getPrompt(id));
 
 ipcMain.on("app-hide", () => {
   copyAndHide();

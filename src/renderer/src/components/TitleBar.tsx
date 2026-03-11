@@ -1,4 +1,4 @@
-export default function TitleBar() {
+export default function TitleBar({ onTogglePromptList }: { onTogglePromptList: () => void }) {
   const prevent = (e: React.MouseEvent) => e.preventDefault();
   const isMac = window.electronAPI.platform === 'darwin';
 
@@ -38,9 +38,33 @@ export default function TitleBar() {
             </button>
           </div>
           <div id="drag-region" />
+          <button
+            className="titlebar-btn"
+            onMouseDown={prevent}
+            onClick={onTogglePromptList}
+            title="Prompts (⌘O)"
+          >
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
+              <line x1="3" y1="4" x2="13" y2="4" />
+              <line x1="3" y1="8" x2="13" y2="8" />
+              <line x1="3" y1="12" x2="10" y2="12" />
+            </svg>
+          </button>
         </>
       ) : (
         <>
+          <button
+            className="titlebar-btn"
+            onMouseDown={prevent}
+            onClick={onTogglePromptList}
+            title="Prompts (Ctrl+O)"
+          >
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
+              <line x1="3" y1="4" x2="13" y2="4" />
+              <line x1="3" y1="8" x2="13" y2="8" />
+              <line x1="3" y1="12" x2="10" y2="12" />
+            </svg>
+          </button>
           <div id="drag-region" />
           <div id="window-controls">
             <button

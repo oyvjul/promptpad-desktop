@@ -3,13 +3,18 @@ import { highlightMarkdown } from "../utils/highlightMarkdown";
 import { useDoubleEscape } from "../hooks/useDoubleEscape";
 import { useEditorSync } from "../hooks/useEditorSync";
 import { useTokenCount } from "../hooks/useTokenCount";
+import { usePromptStorage } from "../hooks/usePromptStorage";
 import StatusBar from "./StatusBar";
 import AsciiPlaceholder from "./AsciiPlaceholder";
 import TitleBar from "./TitleBar";
+import SaveDialog from "./SaveDialog";
+import PromptList from "./PromptList";
 
 export default function Editor() {
   const [value, setValue] = useState("");
   const [currentLine, setCurrentLine] = useState(1);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showPromptList, setShowPromptList] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
   const gutterRef = useRef<HTMLDivElement>(null);
@@ -17,6 +22,7 @@ export default function Editor() {
   useDoubleEscape();
   useEditorSync(textareaRef, highlightRef, gutterRef);
   const tokenCount = useTokenCount(value);
+  const storage = usePromptStorage();
 
   const highlightedHtml = useMemo(
     () => highlightMarkdown(value) + "\n",
@@ -55,6 +61,61 @@ export default function Editor() {
     updateCurrentLine();
   }, [updateCurrentLine]);
 
+  const deriveTitle = useCallback((text: string) => {
+    const firstLine = text.split("\n")[0].replace(/^#+\s*/, "").trim();
+    return firstLine.slice(0, 60) || "Untitled";
+  }, []);
+
+  const handleSave = useCallback(() => {
+    if (storage.currentPromptId) {
+      storage.update(storage.currentPromptId, { content: value });
+    } else {
+      if (value.trim()) {
+        setShowSaveDialog(true);
+      }
+    }
+  }, [storage, value]);
+
+  const handleSaveConfirm = useCallback(
+    (title: string) => {
+      setShowSaveDialog(false);
+      storage.save(title, value);
+      textareaRef.current?.focus();
+    },
+    [storage, value],
+  );
+
+  const handleSaveCancel = useCallback(() => {
+    setShowSaveDialog(false);
+    textareaRef.current?.focus();
+  }, []);
+
+  const handleLoadPrompt = useCallback(
+    async (id: string) => {
+      const prompt = await storage.load(id);
+      if (prompt) {
+        setValue(prompt.content);
+        setShowPromptList(false);
+        textareaRef.current?.focus();
+      }
+    },
+    [storage],
+  );
+
+  const handleNewPrompt = useCallback(() => {
+    setValue("");
+    storage.clearCurrent();
+    setShowPromptList(false);
+    textareaRef.current?.focus();
+  }, [storage]);
+
+  const togglePromptList = useCallback(() => {
+    setShowPromptList((prev) => {
+      if (!prev) storage.refresh();
+      return !prev;
+    });
+  }, [storage]);
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Tab") {
@@ -76,8 +137,16 @@ export default function Editor() {
           document.execCommand("insertText", false, "  ");
         }
       }
+      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+        e.preventDefault();
+        handleSave();
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === "o") {
+        e.preventDefault();
+        togglePromptList();
+      }
     },
-    [],
+    [handleSave, togglePromptList],
   );
 
   // Focus textarea on mount
@@ -87,7 +156,24 @@ export default function Editor() {
 
   return (
     <>
-      <TitleBar />
+      <TitleBar onTogglePromptList={togglePromptList} />
+      {showSaveDialog && (
+        <SaveDialog
+          defaultTitle={deriveTitle(value)}
+          onSave={handleSaveConfirm}
+          onCancel={handleSaveCancel}
+        />
+      )}
+      {showPromptList && (
+        <PromptList
+          prompts={storage.prompts}
+          currentPromptId={storage.currentPromptId}
+          onLoad={handleLoadPrompt}
+          onDelete={storage.remove}
+          onNew={handleNewPrompt}
+          onClose={() => setShowPromptList(false)}
+        />
+      )}
       <div id="line-gutter" ref={gutterRef}>
         {Array.from({ length: lineCount }, (_, i) => (
           <span
@@ -116,6 +202,8 @@ export default function Editor() {
         charCount={value.length}
         lineCount={lineCount}
         tokenCount={tokenCount}
+        promptTitle={storage.currentTitle}
+        savedFlash={storage.savedFlash}
       />
     </>
   );
