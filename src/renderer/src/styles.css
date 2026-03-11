@@ -305,6 +305,7 @@ textarea::placeholder {
   justify-content: center;
   cursor: pointer;
   padding: 0;
+  margin-right: 4px;
   -webkit-app-region: no-drag;
 }
 
@@ -313,8 +314,8 @@ textarea::placeholder {
 }
 
 .titlebar-btn svg {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
 }
 
 /* Prompt list sidebar */
