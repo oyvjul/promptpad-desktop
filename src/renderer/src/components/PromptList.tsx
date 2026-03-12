@@ -11,9 +11,11 @@ interface StoredPrompt {
 interface PromptListProps {
   prompts: StoredPrompt[]
   currentPromptId: string | null
+  isOpen: boolean
   onLoad: (id: string) => void
   onDelete: (id: string) => void
   onClose: () => void
+  onExited: () => void
 }
 
 function relativeDate(iso: string): string {
@@ -32,11 +34,15 @@ function relativeDate(iso: string): string {
 export default function PromptList({
   prompts,
   currentPromptId,
+  isOpen,
   onLoad,
   onDelete,
   onClose,
+  onExited,
 }: PromptListProps) {
-  const [open, setOpen] = useState(false)
+  const [visible, setVisible] = useState(false)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const hasExitedRef = useRef(false)
   const sorted = useMemo(
     () =>
       [...prompts].sort(
@@ -58,10 +64,37 @@ export default function PromptList({
     itemRefs.current.get(highlightedIndex)?.scrollIntoView({ block: 'nearest' })
   }, [highlightedIndex])
 
+  // Trigger enter animation on mount
   useEffect(() => {
-    const raf = requestAnimationFrame(() => setOpen(true))
+    const raf = requestAnimationFrame(() => setVisible(true))
     return () => cancelAnimationFrame(raf)
   }, [])
+
+  // Trigger exit animation when isOpen becomes false
+  useEffect(() => {
+    if (!isOpen) {
+      setVisible(false)
+      hasExitedRef.current = false
+      // Safety timeout in case transitionend doesn't fire
+      const timeout = setTimeout(() => {
+        if (!hasExitedRef.current) {
+          hasExitedRef.current = true
+          onExited()
+        }
+      }, 300)
+      return () => clearTimeout(timeout)
+    }
+  }, [isOpen, onExited])
+
+  const handleTransitionEnd = useCallback(
+    (e: React.TransitionEvent) => {
+      if (e.propertyName === 'transform' && !isOpen && !hasExitedRef.current) {
+        hasExitedRef.current = true
+        onExited()
+      }
+    },
+    [isOpen, onExited],
+  )
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -85,8 +118,13 @@ export default function PromptList({
 
   return (
     <>
-      <div className="prompt-list-backdrop" onClick={onClose} />
-      <div id="prompt-list" className={open ? 'open' : ''}>
+      <div className={`prompt-list-backdrop${visible ? ' visible' : ''}`} onClick={onClose} />
+      <div
+        id="prompt-list"
+        ref={panelRef}
+        className={visible ? 'open' : ''}
+        onTransitionEnd={handleTransitionEnd}
+      >
         <div className="prompt-list-items">
           {sorted.length === 0 && (
             <div className="prompt-list-empty">No saved prompts</div>

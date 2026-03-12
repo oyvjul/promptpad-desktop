@@ -13,6 +13,7 @@ export default function Editor() {
   const [value, setValue] = useState("");
   const [currentLine, setCurrentLine] = useState(1);
   const [showPromptList, setShowPromptList] = useState(false);
+  const [promptListMounted, setPromptListMounted] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
   const gutterRef = useRef<HTMLDivElement>(null);
@@ -115,7 +116,10 @@ export default function Editor() {
 
   const togglePromptList = useCallback(() => {
     setShowPromptList((prev) => {
-      if (!prev) storage.refresh();
+      if (!prev) {
+        storage.refresh();
+        setPromptListMounted(true);
+      }
       return !prev;
     });
   }, [storage]);
@@ -169,13 +173,15 @@ export default function Editor() {
   return (
     <>
       <TitleBar onTogglePromptList={togglePromptList} />
-      {showPromptList && (
+      {promptListMounted && (
         <PromptList
           prompts={storage.prompts}
           currentPromptId={storage.currentPromptId}
+          isOpen={showPromptList}
           onLoad={handleLoadPrompt}
           onDelete={storage.remove}
           onClose={() => setShowPromptList(false)}
+          onExited={() => setPromptListMounted(false)}
         />
       )}
       <div id="line-gutter" ref={gutterRef}>
