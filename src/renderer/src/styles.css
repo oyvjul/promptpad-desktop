@@ -334,10 +334,9 @@ textarea::placeholder {
   right: 0;
   width: 260px;
   height: 100%;
-  background: rgba(40, 40, 40, 0.65);
+  background: rgba(40, 40, 40, 0.99);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
   z-index: 21;
   display: flex;
   flex-direction: column;
@@ -357,6 +356,10 @@ textarea::placeholder {
   padding-top: calc(var(--titlebar-height) + 8px);
 }
 
+.prompt-list-items::-webkit-scrollbar {
+  display: none;
+}
+
 .prompt-list-empty {
   padding: 20px 12px;
   text-align: center;
@@ -372,6 +375,10 @@ textarea::placeholder {
 
 .prompt-list-item:hover {
   background: rgba(255, 255, 255, 0.06);
+}
+
+.prompt-list-item.highlighted {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .prompt-list-item.active {

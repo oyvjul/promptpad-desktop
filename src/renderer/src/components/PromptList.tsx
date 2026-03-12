@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 interface StoredPrompt {
   id: string
@@ -37,6 +37,26 @@ export default function PromptList({
   onClose,
 }: PromptListProps) {
   const [open, setOpen] = useState(false)
+  const sorted = useMemo(
+    () =>
+      [...prompts].sort(
+        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      ),
+    [prompts],
+  )
+
+  const initialIndex = Math.max(0, sorted.findIndex((p) => p.id === currentPromptId))
+  const [highlightedIndex, setHighlightedIndex] = useState(initialIndex)
+  const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map())
+
+  const setItemRef = useCallback((index: number, el: HTMLDivElement | null) => {
+    if (el) itemRefs.current.set(index, el)
+    else itemRefs.current.delete(index)
+  }, [])
+
+  useEffect(() => {
+    itemRefs.current.get(highlightedIndex)?.scrollIntoView({ block: 'nearest' })
+  }, [highlightedIndex])
 
   useEffect(() => {
     const raf = requestAnimationFrame(() => setOpen(true))
@@ -45,15 +65,23 @@ export default function PromptList({
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        onClose()
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setHighlightedIndex((i) => (sorted.length === 0 ? 0 : (i + 1) % sorted.length))
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setHighlightedIndex((i) =>
+          sorted.length === 0 ? 0 : (i - 1 + sorted.length) % sorted.length,
+        )
+      } else if (e.key === 'Enter') {
+        if (sorted.length > 0) onLoad(sorted[highlightedIndex].id)
+      }
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [onClose])
-
-  const sorted = [...prompts].sort(
-    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-  )
+  }, [onClose, onLoad, sorted, highlightedIndex])
 
   return (
     <>
@@ -63,10 +91,11 @@ export default function PromptList({
           {sorted.length === 0 && (
             <div className="prompt-list-empty">No saved prompts</div>
           )}
-          {sorted.map((p) => (
+          {sorted.map((p, i) => (
             <div
               key={p.id}
-              className={`prompt-list-item${p.id === currentPromptId ? ' active' : ''}`}
+              ref={(el) => setItemRef(i, el)}
+              className={`prompt-list-item${p.id === currentPromptId ? ' active' : ''}${i === highlightedIndex ? ' highlighted' : ''}`}
               onClick={() => onLoad(p.id)}
             >
               <div className="prompt-item-top">

@@ -1,89 +1,94 @@
-import { useState, useCallback } from 'react'
-
-interface StoredPrompt {
-  id: string
-  title: string
-  content: string
-  createdAt: string
-  updatedAt: string
-}
+import { useState, useCallback } from "react";
 
 export function usePromptStorage() {
-  const [currentPromptId, setCurrentPromptId] = useState<string | null>(null)
-  const [currentTitle, setCurrentTitle] = useState<string | null>(null)
-  const [prompts, setPrompts] = useState<StoredPrompt[]>([])
-  const [savedFlash, setSavedFlash] = useState(false)
+  const [currentPromptId, setCurrentPromptId] = useState<string | null>(null);
+  const [currentTitle, setCurrentTitle] = useState<string | null>(null);
+  const [prompts, setPrompts] = useState<StoredPrompt[]>([]);
+  const [savedFlash, setSavedFlash] = useState(false);
 
   const refresh = useCallback(async () => {
-    const list = await window.electronAPI.prompts.list()
-    setPrompts(list)
-  }, [])
+    const list = await window.electronAPI.prompts.list();
+    setPrompts(list);
+  }, []);
 
-  const save = useCallback(async (title: string, content: string) => {
-    const prompt = await window.electronAPI.prompts.save(title, content)
-    setCurrentPromptId(prompt.id)
-    setCurrentTitle(prompt.title)
-    // Expose to main process for auto-save on hide
-    ;(window as any).__currentPromptId = prompt.id
-    await refresh()
-    setSavedFlash(true)
-    setTimeout(() => setSavedFlash(false), 2000)
-    return prompt
-  }, [refresh])
+  const save = useCallback(
+    async (title: string, content: string) => {
+      const prompt = await window.electronAPI.prompts.save(title, content);
+      setCurrentPromptId(prompt.id);
+      setCurrentTitle(prompt.title);
+      // Expose to main process for auto-save on hide
+      (window as any).__currentPromptId = prompt.id;
+      await refresh();
+      setSavedFlash(true);
+      setTimeout(() => setSavedFlash(false), 2000);
+      return prompt;
+    },
+    [refresh],
+  );
 
-  const update = useCallback(async (id: string, fields: { title?: string; content?: string }) => {
-    const prompt = await window.electronAPI.prompts.update(id, fields)
-    if (prompt) {
-      setCurrentTitle(prompt.title)
-      await refresh()
-      setSavedFlash(true)
-      setTimeout(() => setSavedFlash(false), 2000)
-    }
-    return prompt
-  }, [refresh])
+  const update = useCallback(
+    async (id: string, fields: { title?: string; content?: string }) => {
+      const prompt = await window.electronAPI.prompts.update(id, fields);
+      if (prompt) {
+        setCurrentTitle(prompt.title);
+        await refresh();
+        setSavedFlash(true);
+        setTimeout(() => setSavedFlash(false), 2000);
+      }
+      return prompt;
+    },
+    [refresh],
+  );
 
-  const silentUpdate = useCallback(async (id: string, fields: { title?: string; content?: string }) => {
-    const prompt = await window.electronAPI.prompts.update(id, fields)
-    if (prompt) {
-      setCurrentTitle(prompt.title)
-    }
-    return prompt
-  }, [])
+  const silentUpdate = useCallback(
+    async (id: string, fields: { title?: string; content?: string }) => {
+      const prompt = await window.electronAPI.prompts.update(id, fields);
+      if (prompt) {
+        setCurrentTitle(prompt.title);
+      }
+      return prompt;
+    },
+    [],
+  );
 
   const load = useCallback(async (id: string) => {
-    const prompt = await window.electronAPI.prompts.load(id)
+    const prompt = await window.electronAPI.prompts.load(id);
     if (prompt) {
-      setCurrentPromptId(prompt.id)
-      setCurrentTitle(prompt.title)
-      ;(window as any).__currentPromptId = prompt.id
+      setCurrentPromptId(prompt.id);
+      setCurrentTitle(prompt.title);
+      (window as any).__currentPromptId = prompt.id;
     }
-    return prompt
-  }, [])
+    return prompt;
+  }, []);
 
-  const remove = useCallback(async (id: string) => {
-    await window.electronAPI.prompts.delete(id)
-    if (currentPromptId === id) {
-      setCurrentPromptId(null)
-      setCurrentTitle(null)
-      ;(window as any).__currentPromptId = null
-    }
-    await refresh()
-  }, [currentPromptId, refresh])
+  const remove = useCallback(
+    async (id: string) => {
+      await window.electronAPI.prompts.delete(id);
+      if (currentPromptId === id) {
+        setCurrentPromptId(null);
+        setCurrentTitle(null);
+        (window as any).__currentPromptId = null;
+      }
+      await refresh();
+    },
+    [currentPromptId, refresh],
+  );
 
   const loadLatest = useCallback(async () => {
-    const list = await window.electronAPI.prompts.list()
-    if (list.length === 0) return null
+    const list = await window.electronAPI.prompts.list();
+    if (list.length === 0) return null;
     const sorted = [...list].sort(
-      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    )
-    return load(sorted[0].id)
-  }, [load])
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
+    return load(sorted[0].id);
+  }, [load]);
 
   const clearCurrent = useCallback(() => {
-    setCurrentPromptId(null)
-    setCurrentTitle(null)
-    ;(window as any).__currentPromptId = null
-  }, [])
+    setCurrentPromptId(null);
+    setCurrentTitle(null);
+    (window as any).__currentPromptId = null;
+  }, []);
 
   return {
     currentPromptId,
@@ -98,5 +103,5 @@ export function usePromptStorage() {
     remove,
     loadLatest,
     clearCurrent,
-  }
+  };
 }
