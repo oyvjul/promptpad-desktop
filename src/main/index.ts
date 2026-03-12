@@ -126,7 +126,7 @@ function toggleWindow() {
 app.whenReady().then(() => {
   loadPrompts();
   createWindow();
-  globalShortcut.register("Ctrl+Space", toggleWindow);
+  globalShortcut.register("CommandOrControl+1", toggleWindow);
 });
 
 ipcMain.handle("prompts:list", () => loadPrompts());
