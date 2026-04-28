@@ -28,8 +28,8 @@ function getPlatformOptions() {
   }
   if (process.platform === "win32") {
     return {
-      backgroundColor: "#00000000",
-      backgroundMaterial: "mica" as const,
+      backgroundColor: "#1e1e1e",
+      backgroundMaterial: "acrylic" as const,
       // DO NOT set transparent: true — it conflicts with backgroundMaterial
     };
   }
@@ -72,6 +72,7 @@ function createWindow() {
       win.setBounds({ width: bounds.width + 1 });
       win.setBounds({ width: bounds.width });
     }
+    win.show();
   });
 
   win.on("show", () => {
@@ -121,6 +122,12 @@ function toggleWindow() {
     }
     win.show();
   }
+}
+
+// WSL / headless Linux: GPU process fails to initialize
+if (process.platform === "linux") {
+  app.commandLine.appendSwitch("disable-gpu");
+  app.commandLine.appendSwitch("disable-software-rasterizer");
 }
 
 app.whenReady().then(() => {
